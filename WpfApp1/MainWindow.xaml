@@ -1,0 +1,46 @@
+﻿<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        xmlns:xtlk="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="768" Width="1366" WindowState="Maximized">
+    <Grid Name="mainGrid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="4*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="8*"/>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Border Grid.Column="1">
+            <Canvas Name="mainCanvas">
+                <Image Name="imgSecond" Stretch="Fill" />
+                <Image Name="imgFirst" Stretch="Fill" />
+            </Canvas>
+        </Border>
+        <StackPanel Grid.Column="0" Margin="0" Background="White" Grid.RowSpan="2">
+            <Button Name="btnOpenFile" Content="Wczytaj pierwszy obraz" Click="btnOpenFile_Click" Margin="5"/>
+            <Button Name="btnOpenFile2" Content="Wczytaj drugi obraz" Click="btnOpenFile2_Click" Margin="5"/>
+            <GroupBox Header="Typy animacji">
+                <StackPanel>
+                    <RadioButton Name="radioButtonFromLeft" Content="Wjazd z lewej" GroupName="Animations" IsChecked="True" Checked="radioButton_Checked"/>
+                    <RadioButton Name="radioButtonFromRight" Content="Wjazd z prawej" GroupName="Animations" Checked="radioButton_Checked"/>
+                    <RadioButton Name="radioButtonFromTop" Content="Wjazd z góry" GroupName="Animations" Checked="radioButton_Checked"/>
+                    <RadioButton Name="radioButtonInBox" Content="Boks wchodzący" GroupName="Animations" Checked="radioButton_Checked"/>
+                    <RadioButton Name="radioButtonOutBox" Content="Boks wychodzący" GroupName="Animations" Checked="radioButton_Checked"/>
+                </StackPanel>
+            </GroupBox>
+            <xtlk:IntegerUpDown Name="intUpDownFrames" Minimum="0" Maximum="30" Value="10" />
+            <Button Name="btnStartAnimation" Content="Start" Click="btnStartAnimation_Click" Margin="5"/>
+            <Button Name="btnStopAnimation" Content="Stop" Click="btnStopAnimation_Click" Margin="5" />
+            <Button Name="btnSaveToFiles" Content="Zapisz animacje" Click="btnSaveToFiles_Click" Margin="5" />
+        </StackPanel>
+        <StackPanel Grid.Row="1" Grid.Column="1" Background="White">
+            <Slider Name="mainSlider" Minimum="0" Maximum="30" ValueChanged="Slider_ValueChanged" />
+        </StackPanel>
+    </Grid>
+</Window>
