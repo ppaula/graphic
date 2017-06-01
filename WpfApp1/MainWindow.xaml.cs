@@ -23,7 +23,7 @@ namespace WpfApp1
     /// </summary>
     public partial class MainWindow : Window
     {
-        //Thread mainThread;
+        Thread mainThread;
         int maxVal = 30;
         double currentSliderPosition = 0;
         int frames;
@@ -78,8 +78,8 @@ namespace WpfApp1
 
             if (!(mainSlider.Value < mainSlider.Maximum))
             {
-                //if (mainThread != null)
-                //    mainThread.Abort();
+                if (mainThread != null)
+                    mainThread.Abort();
 
                 mainSlider.IsEnabled = true;
 
@@ -93,7 +93,7 @@ namespace WpfApp1
             }
         }
 
-        private async void btnStartAnimation_Click(object sender, RoutedEventArgs e)
+        private void btnStartAnimation_Click(object sender, RoutedEventArgs e)
         {
             SetInitialPositionToImage();
 
@@ -102,16 +102,14 @@ namespace WpfApp1
             mainSlider.Value = 0;
             mainSlider.IsEnabled = false;
 
-            PerformAnimation();
-
-            //mainThread = new Thread(new ThreadStart(PerformAnimation));
-            //mainThread.Priority = ThreadPriority.Highest;
-            //mainThread.Start();
+            mainThread = new Thread(new ThreadStart(PerformAnimation));
+            mainThread.Priority = ThreadPriority.Highest;
+            mainThread.Start();
         }
 
         private void btnStopAnimation_Click(object sender, RoutedEventArgs e)
         {
-            //mainThread.Abort();
+            mainThread.Abort();
             mainSlider.IsEnabled = true;
         }
 
@@ -132,7 +130,7 @@ namespace WpfApp1
             }
         }
 
-        private async void btnSaveToFiles_Click(object sender, RoutedEventArgs e)
+        private void btnSaveToFiles_Click(object sender, RoutedEventArgs e)
         {
             frames = (int)intUpDownFrames.Value;
             pngImages = new PngBitmapEncoder[frames];
@@ -144,9 +142,8 @@ namespace WpfApp1
             mainSlider.Maximum = frames;
             mainSlider.IsEnabled = false;
 
-            PerformAnimation();
-            //mainThread = new Thread(new ThreadStart(PerformAnimation));
-            //mainThread.Start();
+            mainThread = new Thread(new ThreadStart(PerformAnimation));
+            mainThread.Start();
         }
 
         #endregion
@@ -208,7 +205,7 @@ namespace WpfApp1
             }
         }
 
-        private async void PerformAnimation()
+        private void PerformAnimation()
         {
             while (currentSliderPosition < maxVal)
             {
