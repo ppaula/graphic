@@ -5,8 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         xmlns:xtlk="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
+        xmlns:conv="clr-namespace:WpfApp1.GUIConverters"
         mc:Ignorable="d"
         Title="MainWindow" Height="768" Width="1366" WindowState="Maximized">
+    <Window.Resources>
+        <conv:RadioButtonsToModelConverter x:Key="radioButtonsToModelConverter" />
+        <conv:BoolReverseConverter x:Key="boolReverseConverter" />
+    </Window.Resources>
     <Grid Name="mainGrid">
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
@@ -16,31 +21,50 @@
             <RowDefinition Height="8*"/>
             <RowDefinition />
         </Grid.RowDefinitions>
-        <Border Grid.Column="1">
+        <Border Grid.Column="1" Height="620" Width="1090">
             <Canvas Name="mainCanvas">
-                <Image Name="imgSecond" Stretch="Fill" />
-                <Image Name="imgFirst" Stretch="Fill" />
+                <Image Name="imgSecond" Source="{Binding Image1Source, UpdateSourceTrigger=PropertyChanged}" Stretch="Fill" Canvas.Left="{Binding CanvasLeftImg2, UpdateSourceTrigger=PropertyChanged}" 
+                       Canvas.Right="{Binding CanvasRightImg2, UpdateSourceTrigger=PropertyChanged}"
+                       Canvas.Top="{Binding CanvasTopImg2, UpdateSourceTrigger=PropertyChanged}"
+                       Canvas.Bottom="{Binding CanvasBottomImg2, UpdateSourceTrigger=PropertyChanged}" 
+                       Height="{Binding HeightImg2, UpdateSourceTrigger=PropertyChanged}"
+                       Width="{Binding WidthImg2, UpdateSourceTrigger=PropertyChanged}" Panel.ZIndex="{Binding Image2ZIndex, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <Image Name="imgFirst" Source="{Binding Image2Source, UpdateSourceTrigger=PropertyChanged}" Stretch="Fill" Canvas.Left="{Binding CanvasLeftImg1, UpdateSourceTrigger=PropertyChanged}" 
+                       Canvas.Right="{Binding CanvasRightImg1, UpdateSourceTrigger=PropertyChanged}"
+                       Canvas.Top="{Binding CanvasTopImg1, UpdateSourceTrigger=PropertyChanged}"
+                       Canvas.Bottom="{Binding CanvasBottomImg1, UpdateSourceTrigger=PropertyChanged}"
+                       Height="{Binding HeightImg1, UpdateSourceTrigger=PropertyChanged}"
+                       Width="{Binding WidthImg1, UpdateSourceTrigger=PropertyChanged}" Panel.ZIndex="{Binding Image1ZIndex, UpdateSourceTrigger=PropertyChanged}"/>
             </Canvas>
         </Border>
         <StackPanel Grid.Column="0" Margin="0" Background="White" Grid.RowSpan="2">
-            <Button Name="btnOpenFile" Content="Wczytaj pierwszy obraz" Click="btnOpenFile_Click" Margin="5"/>
-            <Button Name="btnOpenFile2" Content="Wczytaj drugi obraz" Click="btnOpenFile2_Click" Margin="5"/>
+            <Button Name="btnOpenFile" Content="Wczytaj pierwszy obraz" Margin="5" Command="{Binding LoadImage1Command}"/>
+            <Button Name="btnOpenFile2" Content="Wczytaj drugi obraz" Margin="5" Command="{Binding LoadImage2Command}"/>
             <GroupBox Header="Typy animacji">
                 <StackPanel>
-                    <RadioButton Name="radioButtonFromLeft" Content="Wjazd z lewej" GroupName="Animations" IsChecked="True" Checked="radioButton_Checked"/>
-                    <RadioButton Name="radioButtonFromRight" Content="Wjazd z prawej" GroupName="Animations" Checked="radioButton_Checked"/>
-                    <RadioButton Name="radioButtonFromTop" Content="Wjazd z góry" GroupName="Animations" Checked="radioButton_Checked"/>
-                    <RadioButton Name="radioButtonInBox" Content="Boks wchodzący" GroupName="Animations" Checked="radioButton_Checked"/>
-                    <RadioButton Name="radioButtonOutBox" Content="Boks wychodzący" GroupName="Animations" Checked="radioButton_Checked"/>
+                    <RadioButton Name="radioButtonFromLeft" Content="Wjazd z lewej" GroupName="Animations" 
+                     IsChecked="{Binding AnimationType, Converter={StaticResource radioButtonsToModelConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ConverterParameter=SlideFromLeft}"/>
+                    <RadioButton Name="radioButtonFromRight" Content="Wjazd z prawej" GroupName="Animations" 
+                     IsChecked="{Binding AnimationType, Converter={StaticResource radioButtonsToModelConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,ConverterParameter=SlideFromRight}"/>
+                    <RadioButton Name="radioButtonFromTop" Content="Wjazd z góry" GroupName="Animations"
+                     IsChecked="{Binding AnimationType, Converter={StaticResource radioButtonsToModelConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ConverterParameter=SlideFromTop}"/>
+                    <RadioButton Name="radioButtonFromBottom" Content="Wjazd z dołu" GroupName="Animations"
+                     IsChecked="{Binding AnimationType, Converter={StaticResource radioButtonsToModelConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ConverterParameter=SlideFromBottom}"/>
+                    <RadioButton Name="radioButtonInBox" Content="Wejście" GroupName="Animations"
+                     IsChecked="{Binding AnimationType, Converter={StaticResource radioButtonsToModelConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ConverterParameter=InBox}"/>
+                    <RadioButton Name="radioButtonOutBox" Content="Wyjście" GroupName="Animations"
+                     IsChecked="{Binding AnimationType, Converter={StaticResource radioButtonsToModelConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ConverterParameter=OutBox}"/>
                 </StackPanel>
             </GroupBox>
-            <xtlk:IntegerUpDown Name="intUpDownFrames" Minimum="0" Maximum="30" Value="10" />
-            <Button Name="btnStartAnimation" Content="Start" Click="btnStartAnimation_Click" Margin="5"/>
-            <Button Name="btnStopAnimation" Content="Stop" Click="btnStopAnimation_Click" Margin="5" />
-            <Button Name="btnSaveToFiles" Content="Zapisz animacje" Click="btnSaveToFiles_Click" Margin="5" />
+            <xtlk:IntegerUpDown Name="intUpDownFrames" Minimum="0" Maximum="30" Value="{Binding SliderMaximum, Mode=TwoWay}" />
+            <Button Name="btnStartAnimation" Content="Start" Command="{Binding StartAnimationCommand}" Margin="5"/>
+            <Button Name="btnStopAnimation" Content="Stop" Command="{Binding StopAnimationCommand}" Margin="5" />
+            <CheckBox Name="chbkSaveAnimations" Content="Zapisz animacje" IsChecked="{Binding SaveAnimations}" />
         </StackPanel>
         <StackPanel Grid.Row="1" Grid.Column="1" Background="White">
-            <Slider Name="mainSlider" Minimum="0" Maximum="30" ValueChanged="Slider_ValueChanged" />
+            <Slider Name="mainSlider" Minimum="{Binding SliderMinimum}" Maximum="{Binding SliderMaximum}" IsEnabled="{Binding ElementName=chbkSaveAnimations, Path=IsChecked, Converter={StaticResource boolReverseConverter}}"
+                    Value="{Binding SliderValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         </StackPanel>
     </Grid>
 </Window>
