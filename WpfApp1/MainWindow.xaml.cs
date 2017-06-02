@@ -75,5 +75,11 @@ namespace WpfApp1
                 }
             }
         }
+
+        private void mainSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (animationViewModel.SaveAnimations)
+                SaveFramesToArray();
+        }
     }
 }

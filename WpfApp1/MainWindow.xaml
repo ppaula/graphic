@@ -64,7 +64,7 @@
         </StackPanel>
         <StackPanel Grid.Row="1" Grid.Column="1" Background="White">
             <Slider Name="mainSlider" Minimum="{Binding SliderMinimum}" Maximum="{Binding SliderMaximum}" IsEnabled="{Binding ElementName=chbkSaveAnimations, Path=IsChecked, Converter={StaticResource boolReverseConverter}}"
-                    Value="{Binding SliderValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    Value="{Binding SliderValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ValueChanged="mainSlider_ValueChanged"/>
         </StackPanel>
     </Grid>
 </Window>
