@@ -299,10 +299,11 @@ namespace WpfApp1
         //Metoda wykonywana w wątku
         private void PerformAnimation()
         {
+            var sleep_step = (int)(300 / sliderMaximum);
             while (sliderValue < sliderMaximum)
             {
-                ++SliderValue;
-                Thread.Sleep(50);
+                SliderValue += 0.1;
+                Thread.Sleep(sleep_step);
             }
 
             OnAnimationStopped();
