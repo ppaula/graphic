@@ -489,6 +489,16 @@ namespace WpfApp1
             canvasLeftImg2 = (mainCanvasWidth / 2.0) * sliderValue / sliderMaximum;
             heightImg2 = mainCanvasHeight * (1 - sliderValue / sliderMaximum);
             widthImg2 = mainCanvasWidth * (1 - sliderValue / sliderMaximum);
+            if (sliderValue / sliderMaximum <= 0)
+            {
+                heightImg2 = mainCanvasHeight;
+                widthImg2 = mainCanvasWidth;
+            }
+            else if (sliderValue / sliderMaximum >= 1)
+            {
+                heightImg2 = 1;
+                widthImg2 = 1;
+            }
 
             //Notyfikacja
             ChangeProperty("Image1ZIndex");
