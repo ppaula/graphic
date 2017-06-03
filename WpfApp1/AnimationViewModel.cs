@@ -15,7 +15,7 @@ using System.Windows;
 
 namespace WpfApp1
 {
-    public enum AnimationType { SlideFromLeft, SlideFromRight, SlideFromTop, SlideFromBottom, InBox, OutBox, BrightnessOffOn };
+    public enum AnimationType { SlideFromLeft, SlideFromRight, SlideFromTop, SlideFromBottom, InBox, OutBox, BrightnessOffOn, Alpha };
     public class AnimationViewModel : INotifyPropertyChanged
     {
         Thread mainThread;
@@ -395,6 +395,9 @@ namespace WpfApp1
                 case AnimationType.BrightnessOffOn:
                     BrightnessOffOn();
                     break;
+                case AnimationType.Alpha:
+                    Alpha();
+                    break;
                 default:
                     break;
             }
@@ -544,6 +547,44 @@ namespace WpfApp1
             Image1Source = new BitmapImage(Image1SourceOriginal.UriSource);
             Image2Source = new BitmapImage(Image2SourceOriginal.UriSource);
         }
+
+        //analogicznie do BrightnessOffOn, ale na razie nie działa
+        private void Alpha()
+        {
+            //ustawienie kolejnosci obrazkow
+            Image1ZIndex = 0;
+            Image2ZIndex = 1;
+
+            //Obliczenia
+            if (sliderValue <= 15)
+            {
+                int alpha_value = (int)((sliderValue / 15) * 255);
+                WriteableBitmap writeableBitmap = ChangeAlpha(Image1Source, -alpha_value);
+                BitmapImage writeableBitmapConverted = ConvertWriteableBitmapToBitmapImage(writeableBitmap);
+                Image1Source = writeableBitmapConverted;
+            }
+            else
+            {
+                Image1ZIndex = 1;
+                Image2ZIndex = 0;
+                int alpha_value = (int)(((sliderValue - 15) / 15) * 255 - 255);
+                WriteableBitmap writeableBitmap = ChangeAlpha(Image2Source, alpha_value);
+                BitmapImage writeableBitmapConverted = ConvertWriteableBitmapToBitmapImage(writeableBitmap);
+                Image2Source = writeableBitmapConverted;
+            }
+
+
+            //Notyfikacja
+            ChangeProperty("Image1ZIndex");
+            ChangeProperty("Image2ZIndex");
+            ChangeProperty("Image1Source");
+            ChangeProperty("Image2Source");
+
+            //Kopiujemy Image1Source i Image2Source z oryginału, aby nie rozjaśniać w nieskończoność
+            Image1Source = new BitmapImage(Image1SourceOriginal.UriSource);
+            Image2Source = new BitmapImage(Image2SourceOriginal.UriSource);
+        }
+
         private void SetInitialPositionToImage()
         {
             canvasLeftImg1 = 0;
@@ -618,6 +659,44 @@ namespace WpfApp1
                 pixels,
                 stride,
                 0 );
+
+            // return the new bitmap
+            return myWriteableBitmap;
+        }
+
+
+
+        private WriteableBitmap ChangeAlpha(BitmapImage source, int val)
+        {
+            var myWriteableBitmap = new WriteableBitmap(source.PixelWidth, source.PixelHeight, source.DpiX, source.DpiY, source.Format, null);
+
+
+            int stride = source.PixelWidth * 4;
+            int size = source.PixelHeight * stride;
+            byte[] pixels = new byte[size];
+            source.CopyPixels(pixels, stride, 0);
+
+            for (int x = 0; x < source.PixelWidth; x++)
+            {
+                for (int y = 0; y < source.PixelHeight; y++)
+                {
+                    int index = y * stride + 4 * x;
+
+                    int A = (pixels[index + 3] + val);
+                    int old = pixels[index + 3];
+
+                    if (A > 255) A = 255;
+                    if (A < 0) A = 0;
+
+                    pixels[index + 3] = Convert.ToByte(A);
+                }
+            }
+
+            myWriteableBitmap.WritePixels(
+                new Int32Rect(0, 0, source.PixelWidth, source.PixelHeight),
+                pixels,
+                stride,
+                0);
 
             // return the new bitmap
             return myWriteableBitmap;

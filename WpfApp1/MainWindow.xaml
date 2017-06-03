@@ -57,6 +57,8 @@
                      IsChecked="{Binding AnimationType, Converter={StaticResource radioButtonsToModelConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ConverterParameter=OutBox}"/>
                     <RadioButton Name="radioButtonBrightnessOffOn" Content="Ściemnij - rozjaśnij" GroupName="Animations"
                      IsChecked="{Binding AnimationType, Converter={StaticResource radioButtonsToModelConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ConverterParameter=BrightnessOffOn}"/>
+                    <RadioButton Name="radioButtonAlpha" Content="Zmiana kanału alfa" GroupName="Animations"
+                     IsChecked="{Binding AnimationType, Converter={StaticResource radioButtonsToModelConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ConverterParameter=Alpha}"/>
                 </StackPanel>
             </GroupBox>
             <xtlk:IntegerUpDown Name="intUpDownFrames" Minimum="0" Maximum="30" Value="{Binding SliderMaximum, Mode=TwoWay}" />
