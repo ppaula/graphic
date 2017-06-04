@@ -18,7 +18,8 @@ using System.Drawing.Imaging;
 
 namespace WpfApp1
 {
-    public enum AnimationType { SlideFromLeft, SlideFromRight, SlideFromTop, SlideFromBottom, InBox, OutBox, BrightnessOffOn, Alpha };
+    public enum AnimationType { SlideFromLeft, SlideFromRight, SlideFromTop, SlideFromBottom, InBox, OutBox,
+                                BrightnessOffOn, Alpha, CardHorizontal, CardVertical };
     public class AnimationViewModel : INotifyPropertyChanged
     {
         Thread mainThread;
@@ -268,7 +269,7 @@ namespace WpfApp1
             {
                 System.Uri uri = new System.Uri(openFileDialog.FileName);
                 Image1Source_Bitmap = (Bitmap)Image.FromFile(uri.OriginalString, true);
-                Image1Source = ToBitmapImage(Image1Source_Bitmap);
+                Image1Source = Bitmap2BitmapImage(Image1Source_Bitmap);
                 Image1SourceOriginal = new BitmapImage(uri);
 
             }
@@ -285,7 +286,7 @@ namespace WpfApp1
             {
                 System.Uri uri = new System.Uri(openFileDialog.FileName);
                 Image2Source_Bitmap = (Bitmap)Image.FromFile(uri.OriginalString, true);
-                Image2Source = ToBitmapImage(Image2Source_Bitmap);
+                Image2Source = Bitmap2BitmapImage(Image2Source_Bitmap);
                 Image2SourceOriginal = new BitmapImage(uri);
             }
             //Notyfikacja, ze zmienil sie obrazek 2
@@ -410,6 +411,12 @@ namespace WpfApp1
                 case AnimationType.Alpha:
                     Alpha();
                     break;
+                case AnimationType.CardHorizontal:
+                    AnimationCardHorizontal();
+                    break;
+                case AnimationType.CardVertical:
+                    AnimationCardVertical();
+                    break;
                 default:
                     break;
             }
@@ -526,40 +533,47 @@ namespace WpfApp1
 
         private void BrightnessOffOn()
         {
-            //ustawienie kolejnosci obrazkow
-            Image1ZIndex = 0;
-            Image2ZIndex = 1;
 
             //Obliczenia
             if (sliderValue <= 15)
             {
+                //ustawienie kolejnosci obrazkow
+                Image1ZIndex = 0;
+                Image2ZIndex = 1;
+
                 int brightness_value = (int)((sliderValue / 15) * 255);
                 Image1Source_Bitmap = ChangeBrightness(Image1Source_Bitmap, -brightness_value);
-                Image1Source = ToBitmapImage(Image1Source_Bitmap);
+                Image1Source = Bitmap2BitmapImage(Image1Source_Bitmap);
+
+                //Notyfikacja
+                ChangeProperty("Image1ZIndex");
+                ChangeProperty("Image2ZIndex");
+                ChangeProperty("Image1Source");
+
+                //Kopiujemy Image1Source i Image2Source z oryginału, aby nie rozjaśniać w nieskończoność
+                Image1Source = new BitmapImage(Image1SourceOriginal.UriSource);
+                Image1Source_Bitmap = BitmapImage2Bitmap(Image1Source);
             }
             else
             {
                 Image1ZIndex = 1;
                 Image2ZIndex = 0;
+
                 int brightness_value = (int)(((sliderValue - 15) / 15) * 255 - 255);
                 Image2Source_Bitmap = ChangeBrightness(Image2Source_Bitmap, brightness_value);
-                Image2Source = ToBitmapImage(Image2Source_Bitmap);
+                Image2Source = Bitmap2BitmapImage(Image2Source_Bitmap);
+
+                //Notyfikacja
+                ChangeProperty("Image1ZIndex");
+                ChangeProperty("Image2ZIndex");
+                ChangeProperty("Image2Source");
+
+                //Kopiujemy Image1Source i Image2Source z oryginału, aby nie rozjaśniać w nieskończoność
+                Image2Source = new BitmapImage(Image2SourceOriginal.UriSource);
+                Image2Source_Bitmap = BitmapImage2Bitmap(Image2Source);
 
             }
-
-
-            //Notyfikacja
-            ChangeProperty("Image1ZIndex");
-            ChangeProperty("Image2ZIndex");
-            ChangeProperty("Image1Source");
-            ChangeProperty("Image2Source");
-
-            //Kopiujemy Image1Source i Image2Source z oryginału, aby nie rozjaśniać w nieskończoność
-            //Image1Source = new Bitmap(Image1SourceOriginal);
-            Image1Source = new BitmapImage(Image1SourceOriginal.UriSource);
-            Image2Source = new BitmapImage(Image2SourceOriginal.UriSource);
-            Image1Source_Bitmap = BitmapImage2Bitmap(Image1Source);
-            Image2Source_Bitmap = BitmapImage2Bitmap(Image2Source);
+            
         }
 
         //analogicznie do BrightnessOffOn
@@ -575,10 +589,10 @@ namespace WpfApp1
                 //płynne przechodzenie pierwszego obrazka
                 int alpha_value = (int)((sliderValue / 15) * 255);
                 Image1Source_Bitmap = ChangeAlpha(Image1Source_Bitmap, -alpha_value);
-                Image1Source = ToBitmapImage(Image1Source_Bitmap);
+                Image1Source = Bitmap2BitmapImage(Image1Source_Bitmap);
                 //drugi obrazem cały czas jest przeźroczysty
                 Image2Source_Bitmap = ChangeAlpha(Image2Source_Bitmap, -255);
-                Image2Source = ToBitmapImage(Image2Source_Bitmap);
+                Image2Source = Bitmap2BitmapImage(Image2Source_Bitmap);
             }
             else
             {
@@ -587,10 +601,10 @@ namespace WpfApp1
                 Image2ZIndex = 0;
                 int alpha_value = (int)(((sliderValue - 15) / 15) * 255 - 255);
                 Image2Source_Bitmap = ChangeAlpha(Image2Source_Bitmap, alpha_value);
-                Image2Source = ToBitmapImage(Image2Source_Bitmap);
+                Image2Source = Bitmap2BitmapImage(Image2Source_Bitmap);
                 //pierwszy obrazek caly czas jest przezroczysty
                 Image1Source_Bitmap = ChangeAlpha(Image1Source_Bitmap, -255);
-                Image1Source = ToBitmapImage(Image1Source_Bitmap);
+                Image1Source = Bitmap2BitmapImage(Image1Source_Bitmap);
             }
 
 
@@ -605,6 +619,106 @@ namespace WpfApp1
             Image2Source = new BitmapImage(Image2SourceOriginal.UriSource);
             Image1Source_Bitmap = BitmapImage2Bitmap(Image1Source);
             Image2Source_Bitmap = BitmapImage2Bitmap(Image2Source);
+        }
+
+        
+        private void AnimationCardHorizontal()
+        {
+            
+            //Obliczenia
+            if (sliderValue <= 15)
+            {
+                //ustawienie kolejnosci obrazkow
+                Image1ZIndex = 0;
+                Image2ZIndex = 1;
+
+                canvasTopImg2 = (mainCanvasHeight / 2.0) * sliderValue / (sliderMaximum - 15);
+                heightImg2 = mainCanvasHeight * (1 - sliderValue / (sliderMaximum - 15));
+                canvasTopImg1 = 1000;
+                heightImg1 = 0;
+            }
+            else
+            {
+                //ustawienie kolejnosci obrazkow
+                Image1ZIndex = 1;
+                Image2ZIndex = 0;
+
+                canvasTopImg1 = (mainCanvasHeight / 2.0) * (1 - (sliderValue - 15) / (sliderMaximum - 15));
+                heightImg1 = mainCanvasHeight * ((sliderValue - 15) / (sliderMaximum - 15));
+                canvasTopImg2 = 1000;
+                heightImg2 = 0;
+            }
+
+            if (sliderValue / sliderMaximum <= 0)
+            {
+                heightImg1 = mainCanvasHeight;
+                widthImg1 = mainCanvasWidth;
+                heightImg2 = mainCanvasHeight;
+                widthImg2 = mainCanvasWidth;
+            }
+
+            //Notyfikacja
+            ChangeProperty("Image1ZIndex");
+            ChangeProperty("Image2ZIndex");
+            ChangeProperty("CanvasTopImg2");
+            ChangeProperty("CanvasLeftImg2");
+            ChangeProperty("HeightImg2");
+            ChangeProperty("WidthImg2");
+            ChangeProperty("CanvasTopImg1");
+            ChangeProperty("CanvasLeftImg1");
+            ChangeProperty("HeightImg1");
+            ChangeProperty("WidthImg1");
+
+        }
+        
+        private void AnimationCardVertical()
+        {
+
+            //Obliczenia
+            if (sliderValue <= 15)
+            {
+                //ustawienie kolejnosci obrazkow
+                Image1ZIndex = 0;
+                Image2ZIndex = 1;
+
+                canvasLeftImg2 = (mainCanvasWidth / 2.0) * sliderValue / (sliderMaximum - 15);
+                widthImg2 = mainCanvasWidth * (1 - sliderValue / (sliderMaximum - 15));
+                canvasLeftImg1 = 10000;
+                widthImg1 = 0;
+            }
+            else
+            {
+                //ustawienie kolejnosci obrazkow
+                Image1ZIndex = 1;
+                Image2ZIndex = 0;
+
+                canvasLeftImg1 = (mainCanvasWidth / 2.0) * (1 - (sliderValue - 15) / (sliderMaximum - 15));
+                widthImg1 = mainCanvasWidth * ((sliderValue - 15) / (sliderMaximum - 15));
+                
+                canvasLeftImg2 = 10000;
+                widthImg2 = 0;
+            }
+
+            if (sliderValue / sliderMaximum <= 0)
+            {
+                heightImg1 = mainCanvasHeight;
+                widthImg1 = mainCanvasWidth;
+                heightImg2 = mainCanvasHeight;
+                widthImg2 = mainCanvasWidth;
+            }
+
+            //Notyfikacja
+            ChangeProperty("Image1ZIndex");
+            ChangeProperty("Image2ZIndex");
+            ChangeProperty("CanvasTopImg2");
+            ChangeProperty("CanvasLeftImg2");
+            ChangeProperty("HeightImg2");
+            ChangeProperty("WidthImg2");
+            ChangeProperty("CanvasTopImg1");
+            ChangeProperty("CanvasLeftImg1");
+            ChangeProperty("HeightImg1");
+            ChangeProperty("WidthImg1");
+
         }
 
         private void SetInitialPositionToImage()
@@ -641,7 +755,7 @@ namespace WpfApp1
             ChangeProperty("WidthImg2");
         }
 
-
+        
         //zmiana jasności obrazka przekazanego jako source
         private Bitmap ChangeBrightness(Bitmap Image, int Value)
         {
@@ -664,11 +778,11 @@ namespace WpfApp1
             Attributes.Dispose();
             NewGraphics.Dispose();
             return NewBitmap;
+            //return Image;
 
         }
 
-
-
+        //zmiana kanału alfa
         private Bitmap ChangeAlpha(Bitmap Image, int Value)
         {
             System.Drawing.Bitmap TempBitmap = Image;
@@ -692,10 +806,9 @@ namespace WpfApp1
             return NewBitmap;
         }
 
+        //konwersja BitmapImage -> Bitmap
         private Bitmap BitmapImage2Bitmap(BitmapImage bitmapImage)
         {
-            // BitmapImage bitmapImage = new BitmapImage(new Uri("../Images/test.png", UriKind.Relative));
-
             using (MemoryStream outStream = new MemoryStream())
             {
                 BitmapEncoder enc = new BmpBitmapEncoder();
@@ -707,7 +820,8 @@ namespace WpfApp1
             }
         }
 
-        private static BitmapImage ToBitmapImage(Bitmap bitmap)
+        //Konwersja Bitmap -> BitmapImage
+        private static BitmapImage Bitmap2BitmapImage(Bitmap bitmap)
         {
             using (var memory = new MemoryStream())
             {
@@ -722,6 +836,18 @@ namespace WpfApp1
 
                 return bitmapImage;
             }
+        }
+
+        //resize obrazka
+        private static Bitmap ResizeBitmap(Bitmap imgToResize, System.Drawing.Size size)
+        {
+            Bitmap b = new Bitmap(size.Width, size.Height);
+            using (Graphics g = Graphics.FromImage((Image)b))
+            {
+                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                g.DrawImage(imgToResize, 0, 0, size.Width, size.Height);
+            }
+            return b;
         }
         #endregion
     }

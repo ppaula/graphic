@@ -59,6 +59,10 @@
                      IsChecked="{Binding AnimationType, Converter={StaticResource radioButtonsToModelConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ConverterParameter=BrightnessOffOn}"/>
                     <RadioButton Name="radioButtonAlpha" Content="Zmiana kanału alfa" GroupName="Animations"
                      IsChecked="{Binding AnimationType, Converter={StaticResource radioButtonsToModelConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ConverterParameter=Alpha}"/>
+                    <RadioButton Name="radioButtonCardHorizontal" Content="Kartka - poziomo" GroupName="Animations"
+                     IsChecked="{Binding AnimationType, Converter={StaticResource radioButtonsToModelConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ConverterParameter=CardHorizontal}"/>
+                    <RadioButton Name="radioButtonCardVertical" Content="Kartka - pionowo" GroupName="Animations"
+                     IsChecked="{Binding AnimationType, Converter={StaticResource radioButtonsToModelConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ConverterParameter=CardVertical}"/>
                 </StackPanel>
             </GroupBox>
             <xtlk:IntegerUpDown Name="intUpDownFrames" Minimum="0" Maximum="30" Value="{Binding SliderMaximum, Mode=TwoWay}" />
