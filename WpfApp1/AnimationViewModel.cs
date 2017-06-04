@@ -12,6 +12,9 @@ using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Windows;
+using System.Drawing;
+using System.Windows.Interop;
+using System.Drawing.Imaging;
 
 namespace WpfApp1
 {
@@ -99,6 +102,7 @@ namespace WpfApp1
                 return widthImg1;
             }
         }
+        public Bitmap Image1Source_Bitmap { get; set; }
         public BitmapImage Image1Source { get; set; }
         private BitmapImage Image1SourceOriginal { get; set; }
         //ZIndex - ktory obrazek jest "na wierzchu"
@@ -161,6 +165,7 @@ namespace WpfApp1
                 return widthImg2;
             }
         }
+        public Bitmap Image2Source_Bitmap { get; set; }
         public BitmapImage Image2Source { get; set; }
         private BitmapImage Image2SourceOriginal { get; set; }
         //ZIndes - który obrazek jest "na wierzchu"
@@ -224,6 +229,8 @@ namespace WpfApp1
         }
 
         private double sliderMaximum;
+        private object newSystem;
+
         public double SliderMaximum
         {
             get
@@ -259,22 +266,27 @@ namespace WpfApp1
             OpenFileDialog openFileDialog = new OpenFileDialog();
             if (openFileDialog.ShowDialog() == true)
             {
-                Image1Source = new BitmapImage(new Uri(openFileDialog.FileName));
-                Image1SourceOriginal = new BitmapImage(Image1Source.UriSource);
+                System.Uri uri = new System.Uri(openFileDialog.FileName);
+                Image1Source_Bitmap = (Bitmap)Image.FromFile(uri.OriginalString, true);
+                Image1Source = ToBitmapImage(Image1Source_Bitmap);
+                Image1SourceOriginal = new BitmapImage(uri);
+
             }
             //Notyfikacja ze zmienil sie obrazek 1
             ChangeProperty("Image1Source");
         }
 
-        
+
 
         private void LoadImage2()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             if (openFileDialog.ShowDialog() == true)
             {
-                Image2Source = new BitmapImage(new Uri(openFileDialog.FileName));
-                Image2SourceOriginal = new BitmapImage(Image2Source.UriSource);
+                System.Uri uri = new System.Uri(openFileDialog.FileName);
+                Image2Source_Bitmap = (Bitmap)Image.FromFile(uri.OriginalString, true);
+                Image2Source = ToBitmapImage(Image2Source_Bitmap);
+                Image2SourceOriginal = new BitmapImage(uri);
             }
             //Notyfikacja, ze zmienil sie obrazek 2
             ChangeProperty("Image2Source");
@@ -519,21 +531,20 @@ namespace WpfApp1
             Image2ZIndex = 1;
 
             //Obliczenia
-            if(sliderValue <= 15)
+            if (sliderValue <= 15)
             {
                 int brightness_value = (int)((sliderValue / 15) * 255);
-                WriteableBitmap writeableBitmap = ChangeBrightness(Image1Source, -brightness_value);
-                BitmapImage writeableBitmapConverted = ConvertWriteableBitmapToBitmapImage(writeableBitmap);
-                Image1Source = writeableBitmapConverted;
+                Image1Source_Bitmap = ChangeBrightness(Image1Source_Bitmap, -brightness_value);
+                Image1Source = ToBitmapImage(Image1Source_Bitmap);
             }
             else
             {
                 Image1ZIndex = 1;
                 Image2ZIndex = 0;
                 int brightness_value = (int)(((sliderValue - 15) / 15) * 255 - 255);
-                WriteableBitmap writeableBitmap = ChangeBrightness(Image2Source, brightness_value);
-                BitmapImage writeableBitmapConverted = ConvertWriteableBitmapToBitmapImage(writeableBitmap);
-                Image2Source = writeableBitmapConverted;
+                Image2Source_Bitmap = ChangeBrightness(Image2Source_Bitmap, brightness_value);
+                Image2Source = ToBitmapImage(Image2Source_Bitmap);
+
             }
 
 
@@ -544,11 +555,14 @@ namespace WpfApp1
             ChangeProperty("Image2Source");
 
             //Kopiujemy Image1Source i Image2Source z oryginału, aby nie rozjaśniać w nieskończoność
+            //Image1Source = new Bitmap(Image1SourceOriginal);
             Image1Source = new BitmapImage(Image1SourceOriginal.UriSource);
             Image2Source = new BitmapImage(Image2SourceOriginal.UriSource);
+            Image1Source_Bitmap = BitmapImage2Bitmap(Image1Source);
+            Image2Source_Bitmap = BitmapImage2Bitmap(Image2Source);
         }
 
-        //analogicznie do BrightnessOffOn, ale na razie nie działa
+        //analogicznie do BrightnessOffOn
         private void Alpha()
         {
             //ustawienie kolejnosci obrazkow
@@ -558,19 +572,25 @@ namespace WpfApp1
             //Obliczenia
             if (sliderValue <= 15)
             {
+                //płynne przechodzenie pierwszego obrazka
                 int alpha_value = (int)((sliderValue / 15) * 255);
-                WriteableBitmap writeableBitmap = ChangeAlpha(Image1Source, -alpha_value);
-                BitmapImage writeableBitmapConverted = ConvertWriteableBitmapToBitmapImage(writeableBitmap);
-                Image1Source = writeableBitmapConverted;
+                Image1Source_Bitmap = ChangeAlpha(Image1Source_Bitmap, -alpha_value);
+                Image1Source = ToBitmapImage(Image1Source_Bitmap);
+                //drugi obrazem cały czas jest przeźroczysty
+                Image2Source_Bitmap = ChangeAlpha(Image2Source_Bitmap, -255);
+                Image2Source = ToBitmapImage(Image2Source_Bitmap);
             }
             else
             {
+                //płynne przechodzenie drugiego obrazka
                 Image1ZIndex = 1;
                 Image2ZIndex = 0;
                 int alpha_value = (int)(((sliderValue - 15) / 15) * 255 - 255);
-                WriteableBitmap writeableBitmap = ChangeAlpha(Image2Source, alpha_value);
-                BitmapImage writeableBitmapConverted = ConvertWriteableBitmapToBitmapImage(writeableBitmap);
-                Image2Source = writeableBitmapConverted;
+                Image2Source_Bitmap = ChangeAlpha(Image2Source_Bitmap, alpha_value);
+                Image2Source = ToBitmapImage(Image2Source_Bitmap);
+                //pierwszy obrazek caly czas jest przezroczysty
+                Image1Source_Bitmap = ChangeAlpha(Image1Source_Bitmap, -255);
+                Image1Source = ToBitmapImage(Image1Source_Bitmap);
             }
 
 
@@ -580,9 +600,11 @@ namespace WpfApp1
             ChangeProperty("Image1Source");
             ChangeProperty("Image2Source");
 
-            //Kopiujemy Image1Source i Image2Source z oryginału, aby nie rozjaśniać w nieskończoność
+            //Kopiujemy Image1Source i Image2Source z oryginału, aby nie modyfikować w nieskończoność
             Image1Source = new BitmapImage(Image1SourceOriginal.UriSource);
             Image2Source = new BitmapImage(Image2SourceOriginal.UriSource);
+            Image1Source_Bitmap = BitmapImage2Bitmap(Image1Source);
+            Image2Source_Bitmap = BitmapImage2Bitmap(Image2Source);
         }
 
         private void SetInitialPositionToImage()
@@ -621,104 +643,85 @@ namespace WpfApp1
 
 
         //zmiana jasności obrazka przekazanego jako source
-        private WriteableBitmap ChangeBrightness(BitmapImage source, int val)
+        private Bitmap ChangeBrightness(Bitmap Image, int Value)
         {
-            var myWriteableBitmap = new WriteableBitmap(source.PixelWidth, source.PixelHeight, source.DpiX, source.DpiY, source.Format, null);
+            System.Drawing.Bitmap TempBitmap = Image;
+            float FinalValue = (float)Value / 255.0f;
+            System.Drawing.Bitmap NewBitmap = new System.Drawing.Bitmap(TempBitmap.Width, TempBitmap.Height);
+            System.Drawing.Graphics NewGraphics = System.Drawing.Graphics.FromImage(NewBitmap);
+            float[][] FloatColorMatrix ={
+                      new float[] {1, 0, 0, 0, 0},
+                      new float[] {0, 1, 0, 0, 0},
+                      new float[] {0, 0, 1, 0, 0},
+                      new float[] {0, 0, 0, 1, 0},
+                      new float[] {FinalValue, FinalValue, FinalValue, 1, 1}
+                 };
 
+            System.Drawing.Imaging.ColorMatrix NewColorMatrix = new System.Drawing.Imaging.ColorMatrix(FloatColorMatrix);
+            System.Drawing.Imaging.ImageAttributes Attributes = new System.Drawing.Imaging.ImageAttributes();
+            Attributes.SetColorMatrix(NewColorMatrix);
+            NewGraphics.DrawImage(TempBitmap, new System.Drawing.Rectangle(0, 0, TempBitmap.Width, TempBitmap.Height), 0, 0, TempBitmap.Width, TempBitmap.Height, System.Drawing.GraphicsUnit.Pixel, Attributes);
+            Attributes.Dispose();
+            NewGraphics.Dispose();
+            return NewBitmap;
 
-            int stride = source.PixelWidth * 4;
-            int size = source.PixelHeight * stride;
-            byte[] pixels = new byte[size];
-            source.CopyPixels(pixels, stride, 0);
-
-            for (int x = 0; x < source.PixelWidth; x++)
-            {
-                for (int y = 0; y < source.PixelHeight; y++)
-                {
-                    int index = y * stride + 4 * x;
-
-                    int R = (pixels[index] + val);
-                    int G = (pixels[index + 1] + val);
-                    int B = (pixels[index + 2] + val);
-
-                    if (R > 255) R = 255;
-                    if (G > 255) G = 255;
-                    if (B > 255) B = 255;
-                    if (R < 0) R = 0;
-                    if (G < 0) G = 0;
-                    if (B < 0) B = 0;
-
-                    pixels[index] = Convert.ToByte(R);      //R
-                    pixels[index + 1] = Convert.ToByte(G);  //G
-                    pixels[index + 2] = Convert.ToByte(B);  //B
-                }
-            }
-
-            myWriteableBitmap.WritePixels (
-                new Int32Rect(0, 0, source.PixelWidth, source.PixelHeight),
-                pixels,
-                stride,
-                0 );
-
-            // return the new bitmap
-            return myWriteableBitmap;
         }
 
 
 
-        private WriteableBitmap ChangeAlpha(BitmapImage source, int val)
+        private Bitmap ChangeAlpha(Bitmap Image, int Value)
         {
-            var myWriteableBitmap = new WriteableBitmap(source.PixelWidth, source.PixelHeight, source.DpiX, source.DpiY, source.Format, null);
+            System.Drawing.Bitmap TempBitmap = Image;
+            float FinalValue = (float)Value / 255.0f;
+            System.Drawing.Bitmap NewBitmap = new System.Drawing.Bitmap(TempBitmap.Width, TempBitmap.Height);
+            System.Drawing.Graphics NewGraphics = System.Drawing.Graphics.FromImage(NewBitmap);
+            float[][] FloatColorMatrix ={
+                      new float[] {1, 0, 0, 0, 0},
+                      new float[] {0, 1, 0, 0, 0},
+                      new float[] {0, 0, 1, 0, 0},
+                      new float[] {0, 0, 0, 1, 0},
+                      new float[] {0, 0, 0, FinalValue, 1 }
+                 };
 
-
-            int stride = source.PixelWidth * 4;
-            int size = source.PixelHeight * stride;
-            byte[] pixels = new byte[size];
-            source.CopyPixels(pixels, stride, 0);
-
-            for (int x = 0; x < source.PixelWidth; x++)
-            {
-                for (int y = 0; y < source.PixelHeight; y++)
-                {
-                    int index = y * stride + 4 * x;
-
-                    int A = (pixels[index + 3] + val);
-                    int old = pixels[index + 3];
-
-                    if (A > 255) A = 255;
-                    if (A < 0) A = 0;
-
-                    pixels[index + 3] = Convert.ToByte(A);
-                }
-            }
-
-            myWriteableBitmap.WritePixels(
-                new Int32Rect(0, 0, source.PixelWidth, source.PixelHeight),
-                pixels,
-                stride,
-                0);
-
-            // return the new bitmap
-            return myWriteableBitmap;
+            System.Drawing.Imaging.ColorMatrix NewColorMatrix = new System.Drawing.Imaging.ColorMatrix(FloatColorMatrix);
+            System.Drawing.Imaging.ImageAttributes Attributes = new System.Drawing.Imaging.ImageAttributes();
+            Attributes.SetColorMatrix(NewColorMatrix);
+            NewGraphics.DrawImage(TempBitmap, new System.Drawing.Rectangle(0, 0, TempBitmap.Width, TempBitmap.Height), 0, 0, TempBitmap.Width, TempBitmap.Height, System.Drawing.GraphicsUnit.Pixel, Attributes);
+            Attributes.Dispose();
+            NewGraphics.Dispose();
+            return NewBitmap;
         }
 
-        //konwerter z WriteableBitmap do BitmapImage
-        //konieczny z racji tego, że zapisywać pixele można tylko do WriteableBitmap
-        public BitmapImage ConvertWriteableBitmapToBitmapImage(WriteableBitmap wbm)
+        private Bitmap BitmapImage2Bitmap(BitmapImage bitmapImage)
         {
-            BitmapImage bmImage = new BitmapImage();
-            using (MemoryStream stream = new MemoryStream())
+            // BitmapImage bitmapImage = new BitmapImage(new Uri("../Images/test.png", UriKind.Relative));
+
+            using (MemoryStream outStream = new MemoryStream())
             {
-                PngBitmapEncoder encoder = new PngBitmapEncoder();
-                encoder.Frames.Add(BitmapFrame.Create(wbm));
-                encoder.Save(stream);
-                bmImage.BeginInit();
-                bmImage.CacheOption = BitmapCacheOption.OnLoad;
-                bmImage.StreamSource = stream;
-                bmImage.EndInit();
-                bmImage.Freeze();
+                BitmapEncoder enc = new BmpBitmapEncoder();
+                enc.Frames.Add(BitmapFrame.Create(bitmapImage));
+                enc.Save(outStream);
+                System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(outStream);
+
+                return new Bitmap(bitmap);
             }
-            return bmImage;
+        }
+
+        private static BitmapImage ToBitmapImage(Bitmap bitmap)
+        {
+            using (var memory = new MemoryStream())
+            {
+                bitmap.Save(memory, ImageFormat.Png);
+                memory.Position = 0;
+
+                var bitmapImage = new BitmapImage();
+                bitmapImage.BeginInit();
+                bitmapImage.StreamSource = memory;
+                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapImage.EndInit();
+
+                return bitmapImage;
+            }
         }
         #endregion
     }
