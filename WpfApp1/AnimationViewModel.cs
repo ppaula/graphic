@@ -19,7 +19,8 @@ using System.Drawing.Imaging;
 namespace WpfApp1
 {
     public enum AnimationType { SlideFromLeft, SlideFromRight, SlideFromTop, SlideFromBottom, InBox, OutBox,
-                                BrightnessOffOn, Alpha, CardHorizontal, CardVertical };
+                                BrightnessOffOn, Alpha, CardHorizontal, CardVertical, Shutter,
+                                Additional1 };
     public class AnimationViewModel : INotifyPropertyChanged
     {
         Thread mainThread;
@@ -417,10 +418,17 @@ namespace WpfApp1
                 case AnimationType.CardVertical:
                     AnimationCardVertical();
                     break;
+                case AnimationType.Shutter:
+                    AnimationShutter();
+                    break;
+                case AnimationType.Additional1:
+                    AnimationAdditional1();
+                    break;
                 default:
                     break;
             }
         }
+
 
         private void AnimationFromLeft()
         {
@@ -634,7 +642,8 @@ namespace WpfApp1
 
                 canvasTopImg2 = (mainCanvasHeight / 2.0) * sliderValue / (sliderMaximum - 15);
                 heightImg2 = mainCanvasHeight * (1 - sliderValue / (sliderMaximum - 15));
-                canvasTopImg1 = 1000;
+
+                canvasTopImg1 = 10000;
                 heightImg1 = 0;
             }
             else
@@ -645,7 +654,7 @@ namespace WpfApp1
 
                 canvasTopImg1 = (mainCanvasHeight / 2.0) * (1 - (sliderValue - 15) / (sliderMaximum - 15));
                 heightImg1 = mainCanvasHeight * ((sliderValue - 15) / (sliderMaximum - 15));
-                canvasTopImg2 = 1000;
+                canvasTopImg2 = 10000;
                 heightImg2 = 0;
             }
 
@@ -719,6 +728,78 @@ namespace WpfApp1
             ChangeProperty("HeightImg1");
             ChangeProperty("WidthImg1");
 
+        }
+        private void AnimationShutter()
+        {
+
+            
+        }
+
+        private void AnimationAdditional1()
+        {
+
+            //Obliczenia
+            if (sliderValue <= 10)
+            {
+                //ustawienie kolejnosci obrazkow
+                Image1ZIndex = 0;
+                Image2ZIndex = 1;
+
+                canvasTopImg2 = (mainCanvasHeight / 2.0) * sliderValue / sliderMaximum;
+                canvasLeftImg2 = (mainCanvasWidth / 2.0) * sliderValue / sliderMaximum;
+                heightImg2 = mainCanvasHeight * (1 - sliderValue / sliderMaximum);
+                widthImg2 = mainCanvasWidth * (1 - sliderValue / sliderMaximum);
+
+                heightImg1 = 0;
+                widthImg1 = 0;
+            }
+            else if (sliderValue <= 20)
+            {
+                //ustawienie kolejnosci obrazkow
+                Image1ZIndex = 1;
+                Image2ZIndex = 0;
+
+                canvasLeftImg2 = (mainCanvasWidth / 3.0) * (1 - (sliderValue - 10) / sliderMaximum * 6.0) * 2.0 - mainCanvasWidth / 2.0;
+                heightImg2 = mainCanvasHeight * (1 - 10 / sliderMaximum);
+                widthImg2 = mainCanvasWidth * (1 - 10 / sliderMaximum);
+
+                canvasLeftImg1 = (mainCanvasWidth / 3.0) * ((sliderValue - 10) / sliderMaximum * 6.0) * 2.0 - mainCanvasWidth * 1.2;
+                canvasTopImg1 = (mainCanvasHeight / 2.0) * (10 / sliderMaximum);
+                heightImg1 = mainCanvasHeight * (1 - 10 / sliderMaximum);
+                widthImg1 = mainCanvasWidth * (1 - 10 / sliderMaximum);
+
+            }
+            else
+            {
+                //ustawienie kolejnosci obrazkow
+                Image1ZIndex = 1;
+                Image2ZIndex = 0;
+
+                canvasTopImg1 = (mainCanvasHeight / 2.0) * (1 - sliderValue / sliderMaximum);
+                canvasLeftImg1 = (mainCanvasWidth / 2.0) * (1 - sliderValue / sliderMaximum);
+                heightImg1 = mainCanvasHeight * (sliderValue / sliderMaximum);
+                widthImg1 = mainCanvasWidth * (sliderValue / sliderMaximum);
+            }
+
+            if (sliderValue / sliderMaximum <= 0)
+            {
+                heightImg1 = mainCanvasHeight;
+                widthImg1 = mainCanvasWidth;
+                heightImg2 = mainCanvasHeight;
+                widthImg2 = mainCanvasWidth;
+            }
+
+            //Notyfikacja
+            ChangeProperty("Image1ZIndex");
+            ChangeProperty("Image2ZIndex");
+            ChangeProperty("CanvasTopImg2");
+            ChangeProperty("CanvasLeftImg2");
+            ChangeProperty("HeightImg2");
+            ChangeProperty("WidthImg2");
+            ChangeProperty("CanvasTopImg1");
+            ChangeProperty("CanvasLeftImg1");
+            ChangeProperty("HeightImg1");
+            ChangeProperty("WidthImg1");
         }
 
         private void SetInitialPositionToImage()
