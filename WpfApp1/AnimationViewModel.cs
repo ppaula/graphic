@@ -39,6 +39,8 @@ namespace WpfApp1
             widthImg2 = 1090;
             Image1ZIndex = 1;
             Image2ZIndex = 0;
+            Image1Alpha = 1;
+            Image2Alpha = 1;
 
             //inicjalizacji komend, ktore są podpiete pod przyciski w MainWindow
             StartAnimationCommand = new RelayCommand(StartAnimation);
@@ -110,6 +112,10 @@ namespace WpfApp1
         //ZIndex - ktory obrazek jest "na wierzchu"
         public int Image1ZIndex { get; set; }
 
+        public double Image1Brightness { get; set; }
+
+        public double Image1Alpha { get; set; }
+
         #endregion
 
         #region Img2 Properties
@@ -172,6 +178,8 @@ namespace WpfApp1
         private BitmapImage Image2SourceOriginal { get; set; }
         //ZIndes - który obrazek jest "na wierzchu"
         public int Image2ZIndex { get; set; }
+        public double Image2Brightness { get; set; }
+        public double Image2Alpha { get; set; }
 
         #endregion
 
@@ -410,7 +418,7 @@ namespace WpfApp1
                     BrightnessOffOn();
                     break;
                 case AnimationType.Alpha:
-                    Alpha();
+                    AnimationAlpha();
                     break;
                 case AnimationType.CardHorizontal:
                     AnimationCardHorizontal();
@@ -541,92 +549,120 @@ namespace WpfApp1
 
         private void BrightnessOffOn()
         {
-
-            //Obliczenia
             if (sliderValue <= 15)
             {
-                //ustawienie kolejnosci obrazkow
                 Image1ZIndex = 0;
                 Image2ZIndex = 1;
-
-                int brightness_value = (int)((sliderValue / 15) * 255);
-                Image1Source_Bitmap = ChangeBrightness(Image1Source_Bitmap, -brightness_value);
-                Image1Source = Bitmap2BitmapImage(Image1Source_Bitmap);
-
-                //Notyfikacja
+                Image2Brightness = -sliderValue / sliderMaximum * 2;
                 ChangeProperty("Image1ZIndex");
                 ChangeProperty("Image2ZIndex");
-                ChangeProperty("Image1Source");
-
-                //Kopiujemy Image1Source i Image2Source z oryginału, aby nie rozjaśniać w nieskończoność
-                Image1Source = new BitmapImage(Image1SourceOriginal.UriSource);
-                Image1Source_Bitmap = BitmapImage2Bitmap(Image1Source);
+                ChangeProperty("Image2Brightness");
             }
             else
             {
                 Image1ZIndex = 1;
                 Image2ZIndex = 0;
-
-                int brightness_value = (int)(((sliderValue - 15) / 15) * 255 - 255);
-                Image2Source_Bitmap = ChangeBrightness(Image2Source_Bitmap, brightness_value);
-                Image2Source = Bitmap2BitmapImage(Image2Source_Bitmap);
-
-                //Notyfikacja
+                Image1Brightness = - (30 - sliderValue) / sliderMaximum * 2;
                 ChangeProperty("Image1ZIndex");
                 ChangeProperty("Image2ZIndex");
-                ChangeProperty("Image2Source");
-
-                //Kopiujemy Image1Source i Image2Source z oryginału, aby nie rozjaśniać w nieskończoność
-                Image2Source = new BitmapImage(Image2SourceOriginal.UriSource);
-                Image2Source_Bitmap = BitmapImage2Bitmap(Image2Source);
-
+                ChangeProperty("Image1Brightness");
             }
             
+            
+            
+
+
+            ////Obliczenia
+            //if (sliderValue <= 15)
+            //{
+            //    //ustawienie kolejnosci obrazkow
+            //    Image1ZIndex = 0;
+            //    Image2ZIndex = 1;
+
+            //    int brightness_value = (int)((sliderValue / 15) * 255);
+            //    Image1Source_Bitmap = ChangeBrightness(Image1Source_Bitmap, -brightness_value);
+            //    Image1Source = Bitmap2BitmapImage(Image1Source_Bitmap);
+
+            //    //Notyfikacja
+            //    ChangeProperty("Image1ZIndex");
+            //    ChangeProperty("Image2ZIndex");
+            //    ChangeProperty("Image1Source");
+
+            //    //Kopiujemy Image1Source i Image2Source z oryginału, aby nie rozjaśniać w nieskończoność
+            //    Image1Source = new BitmapImage(Image1SourceOriginal.UriSource);
+            //    Image1Source_Bitmap = BitmapImage2Bitmap(Image1Source);
+            //}
+            //else
+            //{
+            //    Image1ZIndex = 1;
+            //    Image2ZIndex = 0;
+
+            //    int brightness_value = (int)(((sliderValue - 15) / 15) * 255 - 255);
+            //    Image2Source_Bitmap = ChangeBrightness(Image2Source_Bitmap, brightness_value);
+            //    Image2Source = Bitmap2BitmapImage(Image2Source_Bitmap);
+
+            //    //Notyfikacja
+            //    ChangeProperty("Image1ZIndex");
+            //    ChangeProperty("Image2ZIndex");
+            //    ChangeProperty("Image2Source");
+
+            //    //Kopiujemy Image1Source i Image2Source z oryginału, aby nie rozjaśniać w nieskończoność
+            //    Image2Source = new BitmapImage(Image2SourceOriginal.UriSource);
+            //    Image2Source_Bitmap = BitmapImage2Bitmap(Image2Source);
+
+            //}
+
         }
 
         //analogicznie do BrightnessOffOn
-        private void Alpha()
+        private void AnimationAlpha()
         {
             //ustawienie kolejnosci obrazkow
             Image1ZIndex = 0;
             Image2ZIndex = 1;
 
-            //Obliczenia
-            if (sliderValue <= 15)
-            {
-                //płynne przechodzenie pierwszego obrazka
-                int alpha_value = (int)((sliderValue / 15) * 255);
-                Image1Source_Bitmap = ChangeAlpha(Image1Source_Bitmap, -alpha_value);
-                Image1Source = Bitmap2BitmapImage(Image1Source_Bitmap);
-                //drugi obrazem cały czas jest przeźroczysty
-                Image2Source_Bitmap = ChangeAlpha(Image2Source_Bitmap, -255);
-                Image2Source = Bitmap2BitmapImage(Image2Source_Bitmap);
-            }
-            else
-            {
-                //płynne przechodzenie drugiego obrazka
-                Image1ZIndex = 1;
-                Image2ZIndex = 0;
-                int alpha_value = (int)(((sliderValue - 15) / 15) * 255 - 255);
-                Image2Source_Bitmap = ChangeAlpha(Image2Source_Bitmap, alpha_value);
-                Image2Source = Bitmap2BitmapImage(Image2Source_Bitmap);
-                //pierwszy obrazek caly czas jest przezroczysty
-                Image1Source_Bitmap = ChangeAlpha(Image1Source_Bitmap, -255);
-                Image1Source = Bitmap2BitmapImage(Image1Source_Bitmap);
-            }
+            Image2Alpha = (sliderMaximum - sliderValue) / sliderMaximum;
 
-
-            //Notyfikacja
             ChangeProperty("Image1ZIndex");
             ChangeProperty("Image2ZIndex");
-            ChangeProperty("Image1Source");
-            ChangeProperty("Image2Source");
+            ChangeProperty("Image2Alpha");
 
-            //Kopiujemy Image1Source i Image2Source z oryginału, aby nie modyfikować w nieskończoność
-            Image1Source = new BitmapImage(Image1SourceOriginal.UriSource);
-            Image2Source = new BitmapImage(Image2SourceOriginal.UriSource);
-            Image1Source_Bitmap = BitmapImage2Bitmap(Image1Source);
-            Image2Source_Bitmap = BitmapImage2Bitmap(Image2Source);
+            //Obliczenia
+            //if (sliderValue <= 15)
+            //{
+            //    //płynne przechodzenie pierwszego obrazka
+            //    int alpha_value = (int)((sliderValue / 15) * 255);
+            //    Image1Source_Bitmap = ChangeAlpha(Image1Source_Bitmap, -alpha_value);
+            //    Image1Source = Bitmap2BitmapImage(Image1Source_Bitmap);
+            //    //drugi obrazem cały czas jest przeźroczysty
+            //    Image2Source_Bitmap = ChangeAlpha(Image2Source_Bitmap, -255);
+            //    Image2Source = Bitmap2BitmapImage(Image2Source_Bitmap);
+            //}
+            //else
+            //{
+            //    //płynne przechodzenie drugiego obrazka
+            //    Image1ZIndex = 1;
+            //    Image2ZIndex = 0;
+            //    int alpha_value = (int)(((sliderValue - 15) / 15) * 255 - 255);
+            //    Image2Source_Bitmap = ChangeAlpha(Image2Source_Bitmap, alpha_value);
+            //    Image2Source = Bitmap2BitmapImage(Image2Source_Bitmap);
+            //    //pierwszy obrazek caly czas jest przezroczysty
+            //    Image1Source_Bitmap = ChangeAlpha(Image1Source_Bitmap, -255);
+            //    Image1Source = Bitmap2BitmapImage(Image1Source_Bitmap);
+            //}
+
+
+            ////Notyfikacja
+            //ChangeProperty("Image1ZIndex");
+            //ChangeProperty("Image2ZIndex");
+            //ChangeProperty("Image1Source");
+            //ChangeProperty("Image2Source");
+
+            ////Kopiujemy Image1Source i Image2Source z oryginału, aby nie modyfikować w nieskończoność
+            //Image1Source = new BitmapImage(Image1SourceOriginal.UriSource);
+            //Image2Source = new BitmapImage(Image2SourceOriginal.UriSource);
+            //Image1Source_Bitmap = BitmapImage2Bitmap(Image1Source);
+            //Image2Source_Bitmap = BitmapImage2Bitmap(Image2Source);
         }
 
         
@@ -816,6 +852,10 @@ namespace WpfApp1
             widthImg2 = 1090;
             heightImg1 = 620;
             heightImg2 = 620;
+            Image1Brightness = 0;
+            Image2Brightness = 0;
+            Image1Alpha = 1;
+            Image2Alpha = 1;
 
             NotifyAnimationPositionsChanged();
         }
@@ -834,6 +874,10 @@ namespace WpfApp1
             ChangeProperty("HeightImg2");
             ChangeProperty("WidthImg1");
             ChangeProperty("WidthImg2");
+            ChangeProperty("Image1Brightness");
+            ChangeProperty("Image2Brightness");
+            ChangeProperty("Image1Alpha");
+            ChangeProperty("Image2Alpha");
         }
 
         

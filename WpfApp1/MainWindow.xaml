@@ -28,14 +28,22 @@
                        Canvas.Top="{Binding CanvasTopImg2, UpdateSourceTrigger=PropertyChanged}"
                        Canvas.Bottom="{Binding CanvasBottomImg2, UpdateSourceTrigger=PropertyChanged}" 
                        Height="{Binding HeightImg2, UpdateSourceTrigger=PropertyChanged}"
-                       Width="{Binding WidthImg2, UpdateSourceTrigger=PropertyChanged}" Panel.ZIndex="{Binding Image2ZIndex, UpdateSourceTrigger=PropertyChanged}"/>
+                       Width="{Binding WidthImg2, UpdateSourceTrigger=PropertyChanged}" Panel.ZIndex="{Binding Image2ZIndex, UpdateSourceTrigger=PropertyChanged}">
+                    <Image.Effect>
+                        <local:BrightnessEffect Brightness="{Binding Image2Brightness}" Alpha="{Binding Image2Alpha}" />
+                    </Image.Effect>
+                </Image>
 
                 <Image Name="imgFirst" Source="{Binding Image2Source, UpdateSourceTrigger=PropertyChanged}" Stretch="Fill" Canvas.Left="{Binding CanvasLeftImg1, UpdateSourceTrigger=PropertyChanged}" 
                        Canvas.Right="{Binding CanvasRightImg1, UpdateSourceTrigger=PropertyChanged}"
                        Canvas.Top="{Binding CanvasTopImg1, UpdateSourceTrigger=PropertyChanged}"
                        Canvas.Bottom="{Binding CanvasBottomImg1, UpdateSourceTrigger=PropertyChanged}"
                        Height="{Binding HeightImg1, UpdateSourceTrigger=PropertyChanged}"
-                       Width="{Binding WidthImg1, UpdateSourceTrigger=PropertyChanged}" Panel.ZIndex="{Binding Image1ZIndex, UpdateSourceTrigger=PropertyChanged}"/>
+                       Width="{Binding WidthImg1, UpdateSourceTrigger=PropertyChanged}" Panel.ZIndex="{Binding Image1ZIndex, UpdateSourceTrigger=PropertyChanged}">
+                    <Image.Effect>
+                        <local:BrightnessEffect Brightness="{Binding Image1Brightness}" Alpha="{Binding Image1Alpha}" />
+                    </Image.Effect>
+                </Image>
             </Canvas>
         </Border>
         <StackPanel Grid.Column="0" Margin="0" Background="White" Grid.RowSpan="2">
