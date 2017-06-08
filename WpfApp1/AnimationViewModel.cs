@@ -10,7 +10,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Windows;
 using System.Drawing;
 using System.Windows.Interop;
@@ -274,31 +273,38 @@ namespace WpfApp1
         private void LoadImage1()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Pliki obrazów (.jpg)|*.jpg|Pliki obrazów (.png)|*.png|Wszystkie pliki|*.*";
             if (openFileDialog.ShowDialog() == true)
             {
-                System.Uri uri = new System.Uri(openFileDialog.FileName);
-                Image1Source_Bitmap = (Bitmap)Image.FromFile(uri.OriginalString, true);
-                Image1Source = Bitmap2BitmapImage(Image1Source_Bitmap);
-                Image1SourceOriginal = new BitmapImage(uri);
-
+                try
+                {
+                    Image1Source = new BitmapImage(new Uri(openFileDialog.FileName));
+                }
+                catch
+                {
+                    MessageBox.Show("Wybrany plik nie jest obrazem!", "Wybrano niepoprawny plik", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
             }
             //Notyfikacja ze zmienil sie obrazek 1
             ChangeProperty("Image1Source");
         }
 
-
-
         private void LoadImage2()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Pliki obrazów (.jpg)|*.jpg|Pliki obrazów (.png)|*.png|Wszystkie pliki|*.*";
             if (openFileDialog.ShowDialog() == true)
             {
-                System.Uri uri = new System.Uri(openFileDialog.FileName);
-                Image2Source_Bitmap = (Bitmap)Image.FromFile(uri.OriginalString, true);
-                Image2Source = Bitmap2BitmapImage(Image2Source_Bitmap);
-                Image2SourceOriginal = new BitmapImage(uri);
+                try
+                {
+                    Image2Source = new BitmapImage(new Uri(openFileDialog.FileName));
+                }
+                catch
+                {
+                    MessageBox.Show("Wybrany plik nie jest obrazem!", "Wybrano niepoprawny plik", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
             }
-            //Notyfikacja, ze zmienil sie obrazek 2
+            //Notyfikacja ze zmienil sie obrazek 1
             ChangeProperty("Image2Source");
         }
         private void StartAnimation()

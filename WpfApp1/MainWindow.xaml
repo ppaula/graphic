@@ -7,7 +7,7 @@
         xmlns:xtlk="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
         xmlns:conv="clr-namespace:WpfApp1.GUIConverters"
         mc:Ignorable="d"
-        Title="MainWindow" Height="768" Width="1366" WindowState="Maximized">
+        Title="Slide Show" Height="768" Width="1366" WindowState="Maximized" Icon="Resources/icon.ico" >
     <Window.Resources>
         <conv:RadioButtonsToModelConverter x:Key="radioButtonsToModelConverter" />
         <conv:BoolReverseConverter x:Key="boolReverseConverter" />
@@ -77,7 +77,10 @@
                      IsChecked="{Binding AnimationType, Converter={StaticResource radioButtonsToModelConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ConverterParameter=Additional1}"/>
                 </StackPanel>
             </GroupBox>
-            <xtlk:IntegerUpDown Name="intUpDownFrames" Minimum="0" Maximum="30" Value="{Binding SliderMaximum, Mode=TwoWay}" />
+            <DockPanel>
+                <Label Content="Liczba klatek:" FontWeight="Bold"/>
+                <xtlk:IntegerUpDown Name="intUpDownFrames" Minimum="0" Maximum="30" Value="{Binding SliderMaximum, Mode=TwoWay}" />
+            </DockPanel>
             <Button Name="btnStartAnimation" Content="Start" Command="{Binding StartAnimationCommand}" Margin="5"/>
             <Button Name="btnStopAnimation" Content="Stop" Command="{Binding StopAnimationCommand}" Margin="5" />
             <CheckBox Name="chbkSaveAnimations" Content="Zapisz animacje" IsChecked="{Binding SaveAnimations}" />
