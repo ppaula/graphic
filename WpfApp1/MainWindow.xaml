@@ -47,8 +47,8 @@
             </Canvas>
         </Border>
         <StackPanel Grid.Column="0" Margin="0" Background="White" Grid.RowSpan="2">
-            <Button Name="btnOpenFile" Content="Wczytaj pierwszy obraz" Margin="5" Command="{Binding LoadImage1Command}"/>
-            <Button Name="btnOpenFile2" Content="Wczytaj drugi obraz" Margin="5" Command="{Binding LoadImage2Command}"/>
+            <Button Name="btnOpenFile" Content="Wczytaj pierwszy obraz" Command="{Binding LoadImage1Command}"/>
+            <Button Name="btnOpenFile2" Content="Wczytaj drugi obraz" Command="{Binding LoadImage2Command}"/>
             <GroupBox Header="Typy animacji">
                 <StackPanel>
                     <RadioButton Name="radioButtonFromLeft" Content="Wjazd z lewej" GroupName="Animations" 
@@ -81,8 +81,8 @@
                 <Label Content="Liczba klatek:" FontWeight="Bold"/>
                 <xtlk:IntegerUpDown Name="intUpDownFrames" Minimum="0" Maximum="30" Value="{Binding SliderMaximum, Mode=TwoWay}" />
             </DockPanel>
-            <Button Name="btnStartAnimation" Content="Start" Command="{Binding StartAnimationCommand}" Margin="5"/>
-            <Button Name="btnStopAnimation" Content="Stop" Command="{Binding StopAnimationCommand}" Margin="5" />
+            <Button Name="btnStartAnimation" Content="Start" Command="{Binding StartAnimationCommand}" Margin="0,5,0,0"/>
+            <Button Name="btnStopAnimation" Content="Stop" Command="{Binding StopAnimationCommand}" />
             <CheckBox Name="chbkSaveAnimations" Content="Zapisz animacje" IsChecked="{Binding SaveAnimations}" />
         </StackPanel>
         <StackPanel Grid.Row="1" Grid.Column="1" Background="White">
