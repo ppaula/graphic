@@ -555,7 +555,7 @@ namespace WpfApp1
 
         private void BrightnessOffOn()
         {
-            if (sliderValue <= 15)
+            if (sliderValue <= sliderMaximum/2)
             {
                 Image1ZIndex = 0;
                 Image2ZIndex = 1;
@@ -568,7 +568,7 @@ namespace WpfApp1
             {
                 Image1ZIndex = 1;
                 Image2ZIndex = 0;
-                Image1Brightness = - (30 - sliderValue) / sliderMaximum * 2;
+                Image1Brightness = - (sliderMaximum - sliderValue) / sliderMaximum * 2;
                 ChangeProperty("Image1ZIndex");
                 ChangeProperty("Image2ZIndex");
                 ChangeProperty("Image1Brightness");
@@ -676,14 +676,14 @@ namespace WpfApp1
         {
             
             //Obliczenia
-            if (sliderValue <= 15)
+            if (sliderValue <= sliderMaximum/2)
             {
                 //ustawienie kolejnosci obrazkow
                 Image1ZIndex = 0;
                 Image2ZIndex = 1;
 
-                canvasTopImg2 = (mainCanvasHeight / 2.0) * sliderValue / (sliderMaximum - 15);
-                heightImg2 = mainCanvasHeight * (1 - sliderValue / (sliderMaximum - 15));
+                canvasTopImg2 = (mainCanvasHeight / 2.0) * sliderValue / (sliderMaximum - sliderMaximum/2);
+                heightImg2 = mainCanvasHeight * (1 - sliderValue / (sliderMaximum - sliderMaximum/2));
 
                 canvasTopImg1 = 10000;
                 heightImg1 = 0;
@@ -694,8 +694,8 @@ namespace WpfApp1
                 Image1ZIndex = 1;
                 Image2ZIndex = 0;
 
-                canvasTopImg1 = (mainCanvasHeight / 2.0) * (1 - (sliderValue - 15) / (sliderMaximum - 15));
-                heightImg1 = mainCanvasHeight * ((sliderValue - 15) / (sliderMaximum - 15));
+                canvasTopImg1 = (mainCanvasHeight / 2.0) * (1 - (sliderValue - sliderMaximum/2) / (sliderMaximum - sliderMaximum/2));
+                heightImg1 = mainCanvasHeight * ((sliderValue - sliderMaximum/2) / (sliderMaximum - sliderMaximum/2));
                 canvasTopImg2 = 10000;
                 heightImg2 = 0;
             }
@@ -726,14 +726,14 @@ namespace WpfApp1
         {
 
             //Obliczenia
-            if (sliderValue <= 15)
+            if (sliderValue <= sliderMaximum/2)
             {
                 //ustawienie kolejnosci obrazkow
                 Image1ZIndex = 0;
                 Image2ZIndex = 1;
 
-                canvasLeftImg2 = (mainCanvasWidth / 2.0) * sliderValue / (sliderMaximum - 15);
-                widthImg2 = mainCanvasWidth * (1 - sliderValue / (sliderMaximum - 15));
+                canvasLeftImg2 = (mainCanvasWidth / 2.0) * sliderValue / (sliderMaximum - sliderMaximum/2);
+                widthImg2 = mainCanvasWidth * (1 - sliderValue / (sliderMaximum - sliderMaximum/2));
                 canvasLeftImg1 = 10000;
                 widthImg1 = 0;
             }
@@ -743,8 +743,8 @@ namespace WpfApp1
                 Image1ZIndex = 1;
                 Image2ZIndex = 0;
 
-                canvasLeftImg1 = (mainCanvasWidth / 2.0) * (1 - (sliderValue - 15) / (sliderMaximum - 15));
-                widthImg1 = mainCanvasWidth * ((sliderValue - 15) / (sliderMaximum - 15));
+                canvasLeftImg1 = (mainCanvasWidth / 2.0) * (1 - (sliderValue - sliderMaximum/2) / (sliderMaximum - sliderMaximum/2));
+                widthImg1 = mainCanvasWidth * ((sliderValue - sliderMaximum/2) / (sliderMaximum - sliderMaximum/2));
                 
                 canvasLeftImg2 = 10000;
                 widthImg2 = 0;
