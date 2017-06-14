@@ -67,7 +67,7 @@ namespace WpfApp1
         //zapisywanie ramek do pliku
         private void SaveFramesToFiles()
         {
-            for (int i = 1; i < animationViewModel.Frames.Count; ++i)
+            for (int i = 1; i < animationViewModel.Frames.Count - 1; ++i)
             {
                 using (Stream fileStream = File.Create("Frame " + i.ToString("00") + ".png"))
                 {
@@ -78,8 +78,11 @@ namespace WpfApp1
 
         private void mainSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if (animationViewModel.SaveAnimations)
-                SaveFramesToArray();
+            Slider mySlider = sender as Slider;
+            double val = mySlider.Value;
+            if ((int)(val * 10.0) % 10 == 0)
+                if (animationViewModel.SaveAnimations)
+                    SaveFramesToArray();
         }
     }
 }
